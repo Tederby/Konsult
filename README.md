@@ -125,8 +125,8 @@ Konsult supports dedicated prefix modes inspired by the Firefox address bar:
 ### Installation
 Clone the repository:
 ```bash
-git clone https://github.com/your-username/FireFox-SpotLight.git
-cd FireFox-SpotLight
+git clone https://github.com/Tederby/Konsult.git
+cd Konsult
 npm install
 ```
 
