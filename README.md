@@ -1,93 +1,152 @@
-# Konsult (こん 🦊) — Firefox Keyboard Launcher
+<div align="center">
+  <img src="icons/icon-96.png" width="80" height="80" alt="Konsult Logo" />
+  <h1>Konsult</h1>
+  <p>A keyboard-first, low-latency Spotlight and PowerToys Run style launcher for Mozilla Firefox.</p>
 
-> *Fast, keyboard-driven Spotlight and PowerToys Run style quick launcher for Mozilla Firefox.*  
-> **"Kon" (こん)** — the Japanese onomatopoeia for a fox's cry, and a playful pun on **"consult"** (consulting your browser instantly).
+  <p>
+    <a href="https://www.mozilla.org/firefox/"><img src="https://img.shields.io/badge/Firefox-142%2B-FF7139?style=flat-square&logo=firefox-browser&logoColor=white" alt="Firefox 142+" /></a>
+    <a href="https://extensionworkshop.com/documentation/develop/manifest-v3-migration-guide/"><img src="https://img.shields.io/badge/Manifest-MV3-blue?style=flat-square" alt="Manifest V3" /></a>
+    <a href="#"><img src="https://img.shields.io/badge/Tests-17%20Passed-2ea44f?style=flat-square&logo=node.js&logoColor=white" alt="Tests: 17 Passed" /></a>
+    <a href="#"><img src="https://img.shields.io/badge/AMO%20Lint-0%20Warnings-brightgreen?style=flat-square&logo=mozilla&logoColor=white" alt="AMO Lint Clean" /></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="MIT License" /></a>
+    <a href="#"><img src="https://img.shields.io/badge/Telemetry-None-success?style=flat-square" alt="Telemetry: None" /></a>
+    <a href="#"><img src="https://img.shields.io/badge/Runtime%20Deps-0-black?style=flat-square" alt="Zero Runtime Dependencies" /></a>
+  </p>
+</div>
 
 ---
 
-## 🌟 Overview
+## Table of Contents
 
-**Konsult** gives Firefox users an instant, unified launcher summoned by a single global browser shortcut (`Ctrl+Shift+Space`). With zero compile-step overhead, zero external network calls, and zero telemetry, Konsult lets you switch tabs across windows, launch searches with your default search engine, and execute browser commands with sub-millisecond latency.
+- [Overview](#overview)
+- [Features](#features)
+- [Keybindings & Controls](#keybindings--controls)
+- [Query Syntax](#query-syntax)
+- [Quick Start](#quick-start)
+- [Architecture & Design](#architecture--design)
+- [Settings & Configuration](#settings--configuration)
+- [Privacy & Security](#privacy--security)
+- [Development & Testing](#development--testing)
+- [Roadmap](#roadmap)
+- [License](#license)
 
+---
+
+## Overview
+
+**Konsult** (*"Kon"* — the Japanese onomatopoeia for a fox's call, and a pun on *consult*) is a fast, keyboard-driven navigation overlay for Firefox.
+
+Summoned by `Ctrl+Shift+Space`, Konsult runs directly inside Firefox chrome as a browser action popup. It works on every tab—including internal `about:*` pages, PDF viewers, and Mozilla-restricted domains—with zero external network calls, zero tracking, and sub-millisecond in-memory fuzzy search.
+
+```text
++-----------------------------------------------------------------------------------+
+|  Search query, tab title, or '@' for actions...                          [ACTIONS]|
++-----------------------------------------------------------------------------------+
+|  > @newtab - Open a fresh blank tab                                               |
+|    MDN Web Docs: WebExtensions API - developer.mozilla.org                [Win 1] |
+|    GitHub: Where the world builds software - github.com                  [Pinned] |
+|    Search DuckDuckGo for "rust async stream"                             [Search] |
++-----------------------------------------------------------------------------------+
+|  Up/Down: Navigate  |  Enter: Select  |  Shift+Enter: Search  |  Esc: Dismiss     |
++-----------------------------------------------------------------------------------+
 ```
-+-------------------------------------------------------------------------+
-|  🔍  Type a query, tab title, or '@' for actions...            [ACTIONS]|
-+-------------------------------------------------------------------------+
-|  ⚡  @newtab — Open a fresh blank tab                                   |
-|  🦊  Mozilla Firefox Documentation — developer.mozilla.org      [Win 1] |
-|  💻  GitHub: Where the world builds software — github.com      [Pinned] |
-|  🔎  Search DuckDuckGo for "rust async stream"                [Search] |
-+-------------------------------------------------------------------------+
-|  ↑↓ navigate  ·  ↵ select  ·  ⇧↵ web search  ·  esc close               |
-+-------------------------------------------------------------------------+
-```
 
 ---
 
-## ✨ Key Features
+## Features
 
-### 1. 🔍 Default Search Engine Integration
-- **Never Hardcoded:** Konsult automatically queries Firefox's `browser.search.get()` API to detect your active default search engine (DuckDuckGo, Google, Bing, Ecosia, Qwant, etc.) and uses its native icon and label.
-- **Synchronous User-Gesture Dispatch:** Searches execute cleanly via `browser.search.search({ disposition: "NEW_TAB" })` without losing user-action privileges.
-- **Smart Promotion:** If your query doesn't strongly match open tabs (`score < 0.35`), the search row automatically floats to the top for instant search on `Enter`.
-- **Direct URL Detection:** Typing domain names (e.g. `github.com/mozilla` or `localhost:8080`) gives an instant option to navigate directly.
+### Default Search Engine Integration
+- **Zero hardcoding:** Automatically queries `browser.search.get()` to resolve the user's active default engine (DuckDuckGo, Google, Bing, Ecosia, etc.) along with its native icon and title.
+- **Synchronous dispatch:** Dispatches searches via `browser.search.search({ disposition: "NEW_TAB" })` directly within the keydown gesture handler to adhere to Firefox user-action policies.
+- **Smart promotion:** Automatically promotes the search row to position `#1` when fuzzy tab matching falls below threshold (`0.35`).
+- **Direct URL detection:** Automatically suggests direct navigation when the query resembles a domain or URL (e.g. `github.com/mozilla` or `localhost:8080`).
 
-### 2. 📑 Blazing-Fast Tab Switcher
-- **Multi-Window Navigation:** Lists and indexes all open tabs across every Firefox window in memory. Selecting a tab focuses both the target window and the active tab via a dedicated background event executor.
-- **State Badges:** Visual indicators for **Pinned**, **Audio Playing**, **Muted**, and **Sleeping (Discarded)** tabs.
-- **Context Isolation:** Respects Firefox Private Browsing. By default, normal windows only show normal tabs, and private windows only show private tabs.
-- **Custom Sorting & Grouping:**
-  - **Native Order:** By window index and tab sequence (current window tabs pinned to top).
-  - **Alphabetical:** Natural alphanumeric title sorting via `Intl.Collator`.
-  - **Domain Grouping:** Visual headers clustering tabs under common hostnames (e.g. `github.com`, `reddit.com`), with automatic keyboard skip over headers.
+### High-Performance Tab Switcher
+- **Cross-window indexing:** Indexes and caches open tabs across all browser windows upon popup invocation.
+- **Multi-step focus executor:** Delegates window and tab focusing to a background event page (`windows.update` then `tabs.update`) to prevent race conditions during popup destruction.
+- **Tab state badges:** Visual badges for **Pinned**, **Audio Playing**, **Muted**, and **Sleeping (Discarded)** tabs.
+- **Context isolation:** Strict separation between normal and private windows. Private tabs are never surfaced in regular browsing sessions by default.
+- **Custom sorting & grouping:**
+  - *Native Order:* Window sequence with current window pinned to top.
+  - *Alphabetical:* Natural alphanumeric collation via `Intl.Collator`.
+  - *Domain Grouping:* Visual clustering by hostname with automatic keyboard navigation skipping group headers.
 
-### 3. ⚡ Quick `@action` Commands
-Type `@` to access instant browser controls:
-- `@newtab` (`Ctrl+T`): Open a fresh blank tab.
-- `@window` (`Ctrl+N`): Open a new standard window.
-- `@private` (`Ctrl+Shift+P`): Open a private browsing window.
-- `@reload` / `@hardreload`: Reload current tab (with or without cache bypass).
-- `@duplicate`: Clone the active tab in place.
-- `@pin`: Toggle pinned state on active tab.
-- `@mute`: Toggle audio mute state.
-- `@close` (`Ctrl+W`): Close the active tab.
-- `@reader` (`Ctrl+Alt+R`): Toggle Firefox Reader Mode.
-- `@options`: Open Konsult Settings.
-- **Honest Fallbacks for Privileged URLs:** Firefox WebExtensions strictly prohibit extensions from navigating directly to internal chrome pages like `about:addons`, `about:preferences`, and `about:config`. Rather than failing silently, Konsult provides one-click copy to clipboard with native keyboard shortcut reminders.
+### Quick Actions (`@`)
+- Access internal browser controls:
+  - `@newtab` (`Ctrl+T`): Open a fresh blank tab.
+  - `@window` (`Ctrl+N`): Open a new standard window.
+  - `@private` (`Ctrl+Shift+P`): Open a private browsing window.
+  - `@reload` / `@hardreload`: Reload current tab (with or without cache bypass).
+  - `@duplicate`: Duplicate active tab.
+  - `@pin`: Toggle pinned state.
+  - `@mute`: Toggle audio mute state.
+  - `@close` (`Ctrl+W`): Close active tab.
+  - `@reader` (`Ctrl+Alt+R`): Toggle Firefox Reader Mode.
+  - `@options`: Open Konsult preferences.
+- **Honest fallback for privileged URLs:** Firefox security policy prohibits extensions from opening pages like `about:addons` and `about:config` via `tabs.create()`. Konsult displays these actions with one-click clipboard copying and native shortcut guidance instead of failing silently.
 
 ---
 
-## ⌨️ Keyboard Shortcuts & Modifiers
+## Keybindings & Controls
 
-| Shortcut | Description |
-|---|---|
-| `Ctrl+Shift+Space` | Summon / Focus Konsult from any tab (including `about:` pages and PDFs) |
-| `↑` / `↓` or `Ctrl+P` / `Ctrl+N` | Move selection up and down the result list |
-| `PageUp` / `PageDown` | Move selection by 5 items |
-| `Enter` | Execute top-ranked item (switch tab, run action, or search) |
-| `Shift+Enter` | **Force Web Search:** Bypasses tab matches and searches your query |
-| `Ctrl+Enter` | Open web search in a background tab without stealing focus |
-| `Tab` | Autocomplete selected `@action` name into search input |
-| `Escape` | 1st press: Clear search text; 2nd press: Dismiss launcher popup |
+| Keybinding | Scope | Action |
+|---|---|---|
+| `Ctrl+Shift+Space` | Global Browser | Summon or focus Konsult popup |
+| `Down` / `Ctrl+N` | Popup | Move selection down |
+| `Up` / `Ctrl+P` | Popup | Move selection up |
+| `PageDown` / `PageUp` | Popup | Jump selection by 5 rows |
+| `Enter` | Popup | Execute highlighted row (switch tab, run action, or search) |
+| `Shift+Enter` | Popup | **Force Web Search:** Executes search query regardless of tab match |
+| `Ctrl+Enter` | Popup | Open web search in a background tab |
+| `Tab` | Popup | Autocomplete selected `@action` identifier |
+| `Escape` | Popup | First press: clears input; Second press: closes popup |
 
-### Query Prefix Modes
+---
 
-| Prefix | Mode | Example | Description |
+## Query Syntax
+
+Konsult supports dedicated prefix modes inspired by the Firefox address bar:
+
+| Prefix | Mode | Example | Behavior |
 |---|---|---|---|
-| `@` | **Actions** | `@pin`, `@reload` | Filters browser commands and shortcuts |
-| `%` | **Tabs** | `% rust docs` | Constrains query strictly to open tabs |
-| `*` | **Bookmarks** | `* react` | Bookmarks search mode (Roadmap M4) |
+| `@` | Actions | `@reload` | Filters registered commands and shortcuts |
+| `%` | Tabs | `% github pr` | Constrains matching strictly to open tabs |
+| `*` | Bookmarks | `* react` | Bookmarks search mode (planned in roadmap) |
+| *(none)* | All | `rust docs` | Unified ranked search across tabs, actions, and web search |
 
 ---
 
-## 🏗️ Architecture & Technical Design
+## Quick Start
 
-Konsult is engineered for minimal resource consumption, extreme speed, and strict adherence to Mozilla Add-ons (AMO) security standards:
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v18.0.0+)
+- [Mozilla Firefox](https://www.mozilla.org/firefox/) (v142.0+ recommended; verified on Firefox 157)
+
+### Installation
+Clone the repository:
+```bash
+git clone https://github.com/your-username/FireFox-SpotLight.git
+cd FireFox-SpotLight
+npm install
+```
+
+### Launch in Development Mode
+Start an isolated Firefox instance with Konsult pre-installed and auto-reloading:
+```bash
+npm start
+```
+
+Press `Ctrl+Shift+Space` in the newly opened Firefox window to summon the launcher.
+
+---
+
+## Architecture & Design
+
+Konsult is built without compilation tools, bundling steps, or external dependencies.
 
 ```mermaid
 flowchart TD
-  subgraph UI["Popup UI (popup.html)"]
-    direction TB
+  subgraph UI["Popup Window (src/popup/)"]
     INPUT["Search Input & rAF Coalescer"] --> PARSER["query-parser.js"]
     PARSER --> TABS_P["TabsProvider"]
     PARSER --> SEARCH_P["SearchProvider"]
@@ -96,11 +155,11 @@ flowchart TD
     RANKER --> LIST["list-view.js (DOM DocumentFragment)"]
   end
 
-  subgraph BG["Background Event Page (MV3)"]
+  subgraph BG["Background Event Page (src/background/)"]
     EXEC["Executor (focusTab / window focus)"]
   end
 
-  subgraph STORAGE["Storage Layers"]
+  subgraph STORAGE["Storage Subsystem"]
     SYNC[("storage.sync: Preferences")]
     LOCAL[("storage.local: Usage stats")]
   end
@@ -111,102 +170,78 @@ flowchart TD
   EXEC --> FX["Firefox WebExtensions APIs"]
 ```
 
-### Key Technical Decisions:
-1. **Manifest V3 Event Page:** Background script (`src/background/main.js`) unloads when idle and wakes only to handle multi-step window/tab focus sequences.
-2. **Zero-Build Plain ES Modules:** Uses native modern browser ES Modules with JSDoc typing (`// @ts-check`). No Webpack/Vite bundle step is needed, meaning instant live reload during development and transparent review for AMO.
-3. **Vendored `fzy` Scorer:** Fast dynamic programming matching algorithm (~150 LOC) calculating substring alignment, word boundary bonuses, and character positions for visual search highlighting.
-4. **Pure DOM Manipulation:** Eliminates all `innerHTML` assignments in favor of `DocumentFragment` and SVG namespace element factories, completely resolving AMO automated security flags.
-5. **Private Window Protection:** Usage statistics are never recorded during private browsing sessions.
+### Technical Highlights
+1. **Manifest V3 Event Page:** Background script (`src/background/main.js`) remains dormant and unloads when idle, waking only to coordinate multi-step window/tab focus sequences.
+2. **Vendored `fzy` Scorer:** Port of John Hawthorn's dynamic programming fuzzy matching algorithm (`src/vendor/fzy.js`), returning character match indices used for real-time visual text highlighting.
+3. **Pure DOM Generation:** Eliminates all assignments to `innerHTML`. All elements and SVGs are created via `document.createElement`, `document.createTextNode`, and `document.createElementNS`, guaranteeing zero AMO linter warnings.
+4. **Multi-token Conjunction:** Queries separated by whitespace enforce strict `AND` matching across title, hostname, and full URL fields.
+
+Detailed architecture and data flows are documented in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ---
 
-## 🚀 Getting Started & Development
+## Settings & Configuration
 
-### Prerequisites
-- [Node.js](https://nodejs.org/) (v18+)
-- [Mozilla Firefox](https://www.mozilla.org/firefox/) (v142.0+ recommended; tested on Firefox 157)
+Configure preferences via **Konsult Launcher Footer > Settings Icon** or `about:addons` > **Konsult** > **Options**:
 
-### Installation
-Clone the repository and install dev dependencies:
-```bash
-git clone https://github.com/your-username/FireFox-SpotLight.git
-cd FireFox-SpotLight
-npm install
-```
+- **Tabs & Switcher:**
+  - *Sort Mode:* Native tab order vs. Alphabetical (`Intl.Collator`).
+  - *Current Window First:* Keep tabs from the focused window at the top.
+  - *Group by Domain:* Visually cluster tabs under website domain headers.
+  - *Empty Query Order:* Default sort order vs. Most Recently Used (MRU).
+  - *Show Pinned / Discarded:* Toggle visibility of pinned and sleeping tabs.
+- **Search & Navigation:**
+  - *Enter Key Behavior:* Top result vs. Always Web Search.
+  - *Detect Direct URLs:* Enable direct navigation for domain-like queries.
+- **Developer Tools & M0 Probe:**
+  - Includes an empirical test suite that verifies `tabs.create()` permissions against internal `about:*` URLs. (See [docs/about-matrix.md](docs/about-matrix.md)).
 
-### Run Locally (Live Reload)
-Launch Firefox with Konsult loaded as a temporary extension:
-```bash
-npm start
-```
-*Note: Any edits saved to `src/` will trigger an instant reload in the running Firefox instance.*
+---
 
-### Run Automated Tests
-Execute the pure unit test suite:
+## Privacy & Security
+
+- **Local Computation:** All fuzzy matching, tokenization, and tab indexing occur strictly in memory.
+- **Zero Telemetry:** No analytics, tracking pixels, or remote telemetry scripts.
+- **Zero Outbound Network Calls:** No background HTTP requests or remote code execution.
+- **Private Browsing Isolation:** Incognito usage is never recorded to `storage.local`.
+- **Permissions Justification:**
+  - `"tabs"`: Required to read tab titles, URLs, and favicons.
+  - `"search"`: Required to detect the default engine and dispatch search queries.
+  - `"storage"`: Required to persist configuration in `storage.sync`.
+
+---
+
+## Development & Testing
+
+### Unit Tests
+Run the standalone unit test suite via Node.js test runner:
 ```bash
 npm test
 ```
-Tests cover:
-- `fzy` dynamic programming scorer and consecutive match bonuses
-- Substring highlighting and positions calculation
-- Multi-token `AND` conjunction across weighted fields (title, hostname, URL)
-- Query prefix parser (`@`, `%`, `*`)
-- URL detection and normalization
-- Settings deep-merge and ranking formula
 
-### Run WebExtensions Linter
-Validate Manifest V3 permissions and security rules against Mozilla AMO standards:
+### Linter
+Validate Manifest V3 permissions and code compliance with official Mozilla standards:
 ```bash
 npm run lint
 ```
-*Output: 0 errors, 0 warnings, 0 notices.*
+*Current status: 0 errors, 0 warnings, 0 notices.*
+
+### Manual Test Checklist
+For complete verification scenarios (multi-window, audio indicators, search engine switching), refer to [tests/manual/checklist.md](tests/manual/checklist.md).
 
 ---
 
-## ⚙️ Configuration & Settings
+## Roadmap
 
-Access settings via **Konsult Launcher Footer > Settings Icon** or navigate to `about:addons` > **Konsult** > **Options**:
-
-- **Tabs & Switcher:**
-  - *Sort Mode:* Native Firefox order vs. Alphabetical (`Intl.Collator`).
-  - *Current Window First:* Float tabs from the focused window to the top.
-  - *Group by Domain:* Cluster open tabs under visual website domain headers.
-  - *Empty Query Order:* Display tabs in default sort order or Most Recently Used (MRU).
-  - *Show Pinned / Discarded:* Toggle visibility of pinned and sleeping tabs.
-- **Search & Navigation:**
-  - *Enter Key Behavior:* Best match (`topResult`) vs Always Web Search (`alwaysSearch`).
-  - *Detect Direct URLs:* Automatic navigation option for domain-like inputs.
-- **Appearance & Limits:**
-  - *Max Results:* Limit rendered items (default: 50).
-- **Developer Tools & M0 Probe:**
-  - Built-in live testing suite verifying `about:*` URLs against `browser.tabs.create()`.
+- [x] **Milestone 0: Scaffolding & Spikes** — MV3 manifest, icons, background event executor, clean linter.
+- [x] **Milestone 1: Web Search & Tab Switcher** — Default search engine prefetch, fuzzy tab filtering, domain grouping, keyboard nav.
+- [x] **Milestone 2: Command Actions** — `@` action framework with honest fallbacks for privileged pages.
+- [ ] **Milestone 3: Tab Row Actions** — In-list mute, pin, close buttons, and recently closed session restore (`sessions` API).
+- [ ] **Milestone 4: Extended Providers** — Bookmarks search (`*`), duplicate tab deduplication, native Firefox Tab Groups (`tabGroups` API).
 
 ---
 
-## 🔒 Privacy & Permissions
+## License
 
-Konsult is strictly local and private:
-- ❌ **No Telemetry or Analytics.**
-- ❌ **No External Network Calls:** Zero fetch/XHR requests to third-party servers.
-- ❌ **No Eval or Remote Scripts.**
-- ✅ **Minimal Permissions:**
-  - `"tabs"`: Required to read tab titles, URLs, and favicons to display them in the launcher.
-  - `"search"`: Required to detect the user's default engine and dispatch search queries.
-  - `"storage"`: Required to sync user preferences across devices.
-
----
-
-## 🗺️ Roadmap & Milestones
-
-- [x] **M0: Spike & Scaffolding** — MV3 manifest, icons, background event executor, clean AMO lint.
-- [x] **M1: MVP Search & Tab Switcher** — Default search engine integration, fuzzy tab search, domain grouping, multi-window focus, keyboard navigation.
-- [x] **M2: Quick Actions** — Full `@action` registry with honest fallbacks for privileged pages.
-- [ ] **M3: Quick Wins (v1.x)** — In-list tab closing/pinning/muting buttons, `@md` copy markdown link, recently closed sessions.
-- [ ] **M4: Advanced (v2.0)** — Bookmarks search (`*`), duplicate tab cleanup, suspend unused tabs, native Firefox Tab Groups (`tabGroups` API).
-
----
-
-## 📄 License
-
-Distributed under the [MIT License](LICENSE).  
-Fuzzy scoring algorithm based on [fzy](https://github.com/jhawthorn/fzy) by John Hawthorn (MIT License).
+This project is licensed under the [MIT License](LICENSE).  
+The fuzzy scoring algorithm is adapted from [fzy](https://github.com/jhawthorn/fzy) by John Hawthorn (MIT License).
