@@ -38,18 +38,7 @@
 
 Summoned by `Ctrl+Shift+Space`, Konsult runs directly inside Firefox chrome as a browser action popup. It works on every tab—including internal `about:*` pages, PDF viewers, and Mozilla-restricted domains—with zero external network calls, zero tracking, and sub-millisecond in-memory fuzzy search.
 
-```text
-+-----------------------------------------------------------------------------------+
-|  Search query, tab title, or '@' for actions...                          [ACTIONS]|
-+-----------------------------------------------------------------------------------+
-|  > @newtab - Open a fresh blank tab                                               |
-|    MDN Web Docs: WebExtensions API - developer.mozilla.org                [Win 1] |
-|    GitHub: Where the world builds software - github.com                  [Pinned] |
-|    Search DuckDuckGo for "rust async stream"                             [Search] |
-+-----------------------------------------------------------------------------------+
-|  Up/Down: Navigate  |  Enter: Select  |  Shift+Enter: Search  |  Esc: Dismiss     |
-+-----------------------------------------------------------------------------------+
-```
+![Konsult Screenshot](assets/screenshots.png)
 
 ---
 
