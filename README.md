@@ -228,6 +228,8 @@ For complete verification scenarios (multi-window, audio indicators, search engi
 - [ ] **Milestone 3: Tab Row Actions** — In-list mute, pin, close buttons, and recently closed session restore (`sessions` API).
 - [ ] **Milestone 4: Extended Providers** — Bookmarks search (`*`), duplicate tab deduplication, native Firefox Tab Groups (`tabGroups` API).
 
+For detailed feature proposals, ideas backlog, and user experience concepts, see [docs/IDEAS.md](docs/IDEAS.md).
+
 ---
 
 ## License

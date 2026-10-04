@@ -289,6 +289,8 @@ FireFox-SpotLight/
 ├─ package.json
 └─ docs/
    ├─ IMPLEMENTATION_PLAN.md
+   ├─ ARCHITECTURE.md
+   ├─ IDEAS.md
    └─ about-matrix.md
 ```
 
