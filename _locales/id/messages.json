@@ -1,0 +1,48 @@
+{
+  "extName": {
+    "message": "Konsult",
+    "description": "Nama ekstensi"
+  },
+  "extDescription": {
+    "message": "Peluncur keyboard cepat untuk tab, pencarian, dan aksi Firefox — 'Kon' bunyi rubah Jepang sekaligus konsultasi navigasi.",
+    "description": "Deskripsi ekstensi"
+  },
+  "searchPlaceholder": {
+    "message": "Ketik pencarian, judul tab, atau '@' untuk aksi...",
+    "description": "Placeholder input pencarian utama"
+  },
+  "searchRowLabel": {
+    "message": "Cari di $ENGINE$ untuk \"$QUERY$\"",
+    "description": "Label baris pencarian",
+    "placeholders": {
+      "engine": {
+        "content": "$1",
+        "example": "Google"
+      },
+      "query": {
+        "content": "$2",
+        "example": "firefox addons"
+      }
+    }
+  },
+  "tabBadgeAudible": {
+    "message": "Memutar audio",
+    "description": "Indikator tab memutar audio"
+  },
+  "tabBadgeMuted": {
+    "message": "Dibisukan",
+    "description": "Indikator tab dibisukan"
+  },
+  "tabBadgePinned": {
+    "message": "Disematkan",
+    "description": "Indikator tab disematkan"
+  },
+  "tabBadgeDiscarded": {
+    "message": "Ditangguhkan",
+    "description": "Indikator tab ditangguhkan"
+  },
+  "optionsTitle": {
+    "message": "Konsult — Pengaturan",
+    "description": "Judul halaman opsi"
+  }
+}

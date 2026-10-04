@@ -1,0 +1,6 @@
+.agents/
+node_modules/
+.web-extension-id
+web-ext-artifacts/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Konsult — Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="settings-layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="../../icons/icon-48.png" alt="Logo" class="logo">
+        <div>
+          <h2>Konsult</h2>
+          <span class="version">v0.1.0</span>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <a href="#tabs-section" class="active">Tabs & Sorting</a>
+        <a href="#search-section">Search Behavior</a>
+        <a href="#actions-section">Actions & Sigil</a>
+        <a href="#appearance-section">Appearance</a>
+        <a href="#developer-section">Developer & Probe</a>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <header class="content-header">
+        <h1>Extension Settings</h1>
+        <p class="subtitle">Customize the behavior and appearance of Konsult</p>
+      </header>
+
+      <div id="toast" class="toast" style="display: none;">Saved successfully</div>
+
+      <!-- Private browsing notice -->
+      <div id="incognito-notice" class="alert-banner" style="display: none;">
+        <strong>Private Browsing Notice:</strong> Konsult currently does not have permission to run in Private Windows. Enable it in <em>Firefox Add-ons Manager &gt; Konsult &gt; Run in Private Windows</em>.
+      </div>
+
+      <!-- Tabs Section -->
+      <section id="tabs-section" class="card">
+        <h2>Tabs & Switcher</h2>
+        <div class="field-row">
+          <label for="sortMode">Default Tab Sort Mode</label>
+          <select id="sortMode">
+            <option value="native">Native Firefox order (by window & tab index)</option>
+            <option value="alpha">Alphabetical (by tab title)</option>
+          </select>
+        </div>
+
+        <div class="field-row checkbox-row">
+          <input type="checkbox" id="currentWindowFirst">
+          <div>
+            <label for="currentWindowFirst">Show Current Window Tabs First</label>
+            <p class="field-help">Pins tabs from the currently focused window at the top of the list.</p>
+          </div>
+        </div>
+
+        <div class="field-row checkbox-row">
+          <input type="checkbox" id="groupByDomain">
+          <div>
+            <label for="groupByDomain">Group Tabs by Domain</label>
+            <p class="field-help">Visual UI headers clustering tabs sharing the same website domain.</p>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <label for="emptyQueryOrder">When Search Box is Empty</label>
+          <select id="emptyQueryOrder">
+            <option value="sort">Use default sort order</option>
+            <option value="mru">Most recently accessed (MRU)</option>
+          </select>
+        </div>
+
+        <div class="field-row checkbox-row">
+          <input type="checkbox" id="showPinned">
+          <div>
+            <label for="showPinned">Include Pinned Tabs</label>
+            <p class="field-help">Show pinned tabs in switcher results.</p>
+          </div>
+        </div>
+
+        <div class="field-row checkbox-row">
+          <input type="checkbox" id="showDiscarded">
+          <div>
+            <label for="showDiscarded">Include Discarded (Sleeping) Tabs</label>
+            <p class="field-help">Show unloaded tabs in results with a sleeping badge.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Search Section -->
+      <section id="search-section" class="card">
+        <h2>Search & Navigation</h2>
+        <div class="field-row">
+          <label for="enterBehavior">Enter Key Behavior</label>
+          <select id="enterBehavior">
+            <option value="topResult">Open top ranked match (Enter), force search with Shift+Enter</option>
+            <option value="alwaysSearch">Always execute web search on Enter</option>
+          </select>
+        </div>
+
+        <div class="field-row checkbox-row">
+          <input type="checkbox" id="navigateUrlLike">
+          <div>
+            <label for="navigateUrlLike">Detect Direct URLs</label>
+            <p class="field-help">Offer direct navigation when query looks like a domain (e.g. github.com).</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Actions Section -->
+      <section id="actions-section" class="card">
+        <h2>Commands & Actions</h2>
+        <div class="field-row">
+          <label for="actionSigil">Action Prefix Character</label>
+          <input type="text" id="actionSigil" maxlength="2" style="width: 80px; text-align: center;">
+          <p class="field-help">Trigger symbol to enter command mode (default is <code>@</code>).</p>
+        </div>
+      </section>
+
+      <!-- Appearance Section -->
+      <section id="appearance-section" class="card">
+        <h2>Appearance & Density</h2>
+        <div class="field-row">
+          <label for="maxResults">Max Results to Display</label>
+          <input type="number" id="maxResults" min="10" max="100" style="width: 100px;">
+        </div>
+      </section>
+
+      <!-- Developer & Probe Section -->
+      <section id="developer-section" class="card dev-card">
+        <h2>Developer Tools & M0 Probe</h2>
+        <p class="field-help">Milestone 0 probe to empirically test Firefox WebExtensions restrictions on opening <code>about:*</code> URLs via <code>tabs.create()</code>.</p>
+        <button id="run-probe-btn" class="btn btn-secondary">Run About-URL Probe</button>
+        <div id="probe-results" class="probe-output" style="display: none;">
+          <h3>Probe Summary</h3>
+          <div id="probe-summary" class="probe-stats"></div>
+          <textarea id="probe-markdown" readonly rows="10" class="probe-textarea"></textarea>
+        </div>
+      </section>
+
+      <div class="actions-bar">
+        <button id="save-btn" class="btn btn-primary">Save Changes</button>
+        <button id="reset-btn" class="btn btn-outline">Reset to Defaults</button>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="options.js"></script>
+</body>
+</html>

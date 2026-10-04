@@ -1,0 +1,48 @@
+{
+  "extName": {
+    "message": "Konsult",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "Fast keyboard launcher for Firefox tabs, search, and actions — 'Kon' like a fox, ready to consult.",
+    "description": "Extension description"
+  },
+  "searchPlaceholder": {
+    "message": "Type a query, tab title, or '@' for actions...",
+    "description": "Placeholder for the main search input"
+  },
+  "searchRowLabel": {
+    "message": "Search $ENGINE$ for \"$QUERY$\"",
+    "description": "Search row label",
+    "placeholders": {
+      "engine": {
+        "content": "$1",
+        "example": "Google"
+      },
+      "query": {
+        "content": "$2",
+        "example": "firefox addons"
+      }
+    }
+  },
+  "tabBadgeAudible": {
+    "message": "Playing audio",
+    "description": "Audible tab indicator"
+  },
+  "tabBadgeMuted": {
+    "message": "Muted",
+    "description": "Muted tab indicator"
+  },
+  "tabBadgePinned": {
+    "message": "Pinned",
+    "description": "Pinned tab indicator"
+  },
+  "tabBadgeDiscarded": {
+    "message": "Discarded",
+    "description": "Discarded tab indicator"
+  },
+  "optionsTitle": {
+    "message": "Konsult — Settings",
+    "description": "Options page title"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "konsult",
+  "version": "0.1.0",
+  "description": "Konsult — Fast Spotlight & PowerToys Run style keyboard launcher for Firefox",
+  "type": "module",
+  "scripts": {
+    "lint": "npx web-ext lint",
+    "test": "node --test tests/unit/*.test.js",
+    "start": "npx web-ext run --firefox=\"C:\\Program Files\\Mozilla Firefox\\firefox.exe\""
+  },
+  "keywords": [
+    "firefox",
+    "webextension",
+    "konsult",
+    "spotlight",
+    "launcher",
+    "tabs",
+    "fuzzy-search"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "web-ext": "^10.7.0"
+  }
+}
